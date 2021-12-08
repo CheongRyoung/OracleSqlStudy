@@ -68,3 +68,56 @@ select sum(salesprice) as "총 매출",  -- 총합을 구하는 집계함수
 from orders;
 
 select count(*) as "총 개수" from orders; -- 행의 갯수 구하는 집계함수
+
+-- 2021-12-08 --
+-- SQL 실행에러 원인: custid는 4개이상의 행이 필요한데, count, sum은 한 개의 행만 생성하기 때문
+-- select 문에서 속성으로 집계함수를 사용할 할 때, 일반 속성과 함께 사용하면 안된다.
+-- 단, group by로 지정된 속성은 집계함수와 같이 사용할 수 있음
+select custid, count(*) as 도서수량, sum(salesprice) as "총 액" from orders;
+-- 특정 속성 내의 값 별로 집계함수를 사용하기 위해서는 'group by 특정속성' 을 통해 반환
+select custid, count(*) as 도서수량, sum(salesprice) as "총 액" from orders group by custid;
+-- group by + 속성이름: 속성이름으로 그룹핑, 집계함수와 같이 많이 사용
+-- having: group by 결과 행들에 대하여 where 처럼 행들을 선택할때 사용, group by 키워드 없이 단독 사용 불가
+select custid, count(*) as "도서수량" from orders where salesprice >= 8000 group by custid having COUNT(*)>=2;
+
+-- cartesian product, join
+select * from customer, orders;
+select * from customer, orders where orders.custid = customer.custid;
+select * from customer, orders where orders.custid = customer.custid order by customer.custid;
+select name, salesprice from customer, orders WHERE orders.custid = customer.custid;
+select customer.custid, customer.name, sum(salesprice) as "총 판매액" from customer,orders where orders.custid = customer.custid group by customer.custid, customer.name order by customer.custid;
+-- group by에서 속성이름이 여러개 나올 경우의 의미: 첫번째 속성으로 그룹핑하고, 그룹핑 결과내에서 두번째 속성으로 다시 소그룹으로 그룹핑함
+
+select name, bookname from customer, orders, book where orders.custid = customer.custid and orders.bookid = book.bookid;
+select name, bookname from customer, orders, book where orders.custid = customer.custid and orders.bookid = book.bookid and book.price = 20000;
+
+-- ANSI JOIN, OUTER JOIN: 자연조인시 조인에 실패한 투플을 모두 보여주되 값이 없는 대응 속성에는 NULL값을 채워서 반환
+-- LEFT OUTER JOIN
+SELECT name, salesprice from customer LEFT OUTER join orders on orders.custid = customer.custid; 
+SELECT customer.name, salesprice FROM customer, orders where customer.custid = orders.custide(+);
+-- RIGHT OUTER JOIN
+SELECT name, salesprice from customer right outer join orders on orders.custid = customer.custid;
+SELECT customer.name, salesprice FROM customer, orders where customer.custid(+) = orders.custide;
+-- FULL OUTER JOIN
+SELECT name, salesprice from customer FULL OUTER JOIN orders ON orders.custid = customer.custid;
+SELECT customer.name, salesprice FROM customer, orders where customer.custid = orders.custide;
+
+-- 부속질의 (sub query): SELECT안에 SELECT문을 사용하는 경우, 포함된 SELECT문을 말함, 사용: SELECT, FROM, WHERE 모두 사용 가능
+SELECT bookname FROM book WHERE price = (SELECT MAX(price) from book);
+-- (SELECT MAX(price) from book)은 35000과 같음
+SELECT * FROM book;
+SELECT name FROM customer where custid in(select custid from orders where bookid in(select bookid from book where publisher = '대한미디어'));
+SELECT name FROM customer, book, orders where customer.custid=orders.custid and orders.bookid = book.bookid and book.publisher = '대한미디어';
+
+-- 상관 부속질의
+-- b1, b2: book의 별명(alias)
+select b1.bookname , b1.publisher
+from book b1 
+where b1.price > (select avg(b2.price) from book b2 where b2.publisher = b1.publisher); 
+
+-- 차집합
+select name from customer minus select name from customer where custid in(select custid from orders);
+
+-- EXISTS: 뒤 문항이 존재하면 가져오고 존재하지 않으면 가져오지 않음
+select name, address from customer cs where exists (select * from orders od where cs.custid = od.custid);
+select name, address from customer where custid in(select custid from orders);
