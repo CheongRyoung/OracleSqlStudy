@@ -111,9 +111,10 @@ SELECT name FROM customer, book, orders where customer.custid=orders.custid and 
 
 -- 상관 부속질의
 -- b1, b2: book의 별명(alias)
-select b1.bookname , b1.publisher
-from book b1 
-where b1.price > (select avg(b2.price) from book b2 where b2.publisher = b1.publisher); 
+select b1.bookname , b1.publisher from book b1 where b1.price > (select avg(b2.price) from book b2 where b2.publisher = b1.publisher); 
+-- 릴레이션을 순차적으로 처리함 b1의 첫튜플의 price는 b1 첫튜플의 퍼블리셔와 b2의 퍼블리셔와 일치하는 평균 값을 구한 뒤 반환
+
+
 
 -- 차집합
 select name from customer minus select name from customer where custid in(select custid from orders);
