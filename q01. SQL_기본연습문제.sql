@@ -83,33 +83,33 @@ SELECT ROUND(max(sal)) "MAX", ROUND(min(sal)) "MIN", ROUND(sum(sal)) "SUM", ROUN
 --(6) 업무이름과 업무별로 동일한 업무를 하는 사원의 수를 출력하시오. 열 이름은 각각 ‘업무’와 ‘업무별 사원수’로 한다.
 SELECT dept.dname, count(emp.deptno) FROM emp, dept WHERE emp.deptno=dept.deptno GROUP BY dept.dname;
 --(7) 사원의 최대 급여와 최소 급여의 차액을 출력하시오.
-
+SELECT max(sal), min(sal), max(sal) - min(sal) FROM emp;
 --(8) 30번 부서의 구성원 수와 사원들 급여의 합계와 평균을 출력하시오.
---
+SELECT count(*), max(sal), avg(sal) FROM (SELECT * FROM emp WHERE deptno=30);
 --(9) 평균급여가 가장 높은 부서의 번호를 출력하시오.
---
+SELECT max(deptno) FROM (SELECT deptno, avg(sal) FROM emp GROUP BY deptno);
 --(10) 세일즈맨을 제외하고, 각 업무별 사원들의 총 급여가 3000 이상인 각 업무에 대해
 --서, 업무명과 각 업무별 평균 급여를 출력하되, 평균급여의 내림차순으로 출력하시오.
---
+SELECT job, avg(sal) FROM emp GROUP BY job HAVING sum(sal) >= 3000 AND job NOT IN('SALESMAN') ORDER BY avg(sal) DESC;
 --(11) 전체 사원 가운데 직속상관이 있는 사원의 수를 출력하시오.
---
+SELECT count(mgr) FROM emp;
 --(12) Emp 테이블에서 이름, 급여, 커미션 금액, 총액(sal + comm)을 구하여 총액이 많
 --은 순서대로 출력하시오. 단, 커미션이 NULL인 사람은 제외한다.
---
+SELECT ename, sal, comm, (sal + comm) "총액" FROM emp WHERE comm IS NOT null;
 --(13) 각 부서별로 같은 업무를 하는 사람의 인원수를 구하여 부서번호, 업무명, 인원수
 --를 출력하시오.
---
+SELECT deptno, job, count(*) FROM emp GROUP BY deptno, job;
 --(14) 사원이 한 명도 없는 부서의 이름을 출력하시오.
---
+SELECT dname FROM emp, dept WHERE emp.deptno(+) = dept.deptno AND empno IS NULL;
 --(15) 같은 업무를 하는 사람의 수가 4명 이상인 업무와 인원수를 출력하시오.
---
+SELECT job, count(job) FROM emp GROUP BY job HAVING count(job) >= 4;
 --(16) 사원번호가 7400 이상 7600 이하인 사원의 이름을 출력하시오.
---
+SELECT ename FROM emp WHERE empno between 7400 AND 7600;
 --(17) 사원의 이름과 사원의 부서를 출력하시오.
---
+SELECT ename, dname FROM emp, dept WHERE emp.deptno=dept.deptno;
 --(18) 사원의 이름과 팀장의 이름을 출력하시오.
---
+SELECT e.ename, m.ename FROM emp e, emp m WHERE e.mgr=m.empno;
 --(19) 사원 SCOTT보다 급여를 많이 받는 사람의 이름을 출력하시오.
---
+SELECT ename FROM emp WHERE sal > (select sal from emp where ename='SCOTT');
 --(20) 사원 SCOTT가 일하는 부서번호 혹은 DALLAS에 있는 부서번호를 출력하시오.
---
+SELECT deptno FROM emp WHERE ename='SCOTT' OR deptno=(select deptno from dept where loc='DALLAS') GROUP by deptno;
