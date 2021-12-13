@@ -31,3 +31,18 @@ SELECT orderid, salesprice FROM orders WHERE salesprice > (SELECT min(salesprice
 -- 2) 해당 행이 존재하면 true
 -- 3) 기능은 IN, ANY(SOME)와 동일
 SELECT SUM(salesprice) "total" FROM orders od WHERE EXISTS (SELECT * FROM customer cs WHERE address LIKE '%대한민국%' AND cs.custid=od.custid);
+
+-- ROWNUM: Oracle에서 table 생성후, row를 insert할 때 마다 내부적으로 관리하는 순차 번호
+SELECT ROWNUM "순번", custid, name, phone FROM customer WHERE ROWNUM <=2;
+
+-- book table에서 price가 가장 작은 2개의 책을 선택하고 싶음
+SELECT rownum, book.* FROM book;
+-- 1) order by를 적용해서 오름차순으로 sorting했지만, price가 가장 작은 2개 책을 선택 불가능
+SELECT rownum, book.* FROM book ORDER BY price;
+
+SELECT * FROM (SELECT * FROM BOOK ORDER BY price) b WHERE ROWNUM <= 2;
+-- from 다음에 select를 사용하여 새로운 inline view table을 생성하면 rownum이 view table기준으로 새로 생성됨
+SELECT rownum, b.* FROM (SELECT * FROM BOOK ORDER BY price) b;
+
+-- 책값(price)이 가장 큰 1~3위 까지의 행을 선택하시오.
+SELECT * FROM (SELECT * FROM book order by price desc) WHERE rownum <= 3;
