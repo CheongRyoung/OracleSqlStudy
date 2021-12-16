@@ -1,0 +1,44 @@
+--1. Stored procedure(Procedure: JAVA에서 method의 return type이 void인 경우)
+DROP TABLE EMP01;
+
+CREATE TABLE EMP01 AS SELECT *FROM EMP;
+SELECT * FROM EMP01;
+
+-- PROCEDURE를 데이터베이스에 저장하는 명령어
+@C:\DevSpace\DBSpace\procedure01.sql;
+
+-- 저장된 프로시져(STORED PROCEDURE)의 이름으로 실행
+EXECUTE DEL_ALL;
+
+-- 저장 프로시져 조회하기
+DESC USER_SOURCE;
+SELECT NAME, TEXT FROM USER_SOURCE;
+
+-- PARAMETER가 있는 PROCEDURE
+DROP TABLE EMP01;
+CREATE TABLE EMP01 AS SELECT * FROM EMP;
+SELECT * FROM EMP01;
+
+@C:\DevSpace\DBSpace\procedure02.sql;
+EXECUTE del_ename('SMITH');
+
+-- PROCEDURE PARAMETER 내의 IN과 OUT
+@C:\DevSpace\DBSpace\procedure03.sql;
+VARIABLE VAR_ENAME VARCHAR2(15);
+VARIABLE VAR_SAL NUMBER;
+VARIABLE VAR_JOB VARCHAR2(9);
+
+EXECUTE SEL_EMPNO(7788, :VAR_ENAME, :VAR_SAL, :VAR_JOB);
+PRINT VAR_ENAME;
+PRINT VAR_SAL;
+PRINT VAR_JOB;
+
+--2. Funtion(Java에서 method의 return type이 void가 아닌 경우)
+@C:\DevSpace\DBSpace\FUNCTION01.sql;
+
+VARIABLE VAR_RES NUMBER;
+EXECUTE :VAR_RES := CAL_BONUS(7788);
+PRINT VAR_RES;
+
+-- SELECT문에서 선언된 함수를 사용 가능(집계함수마냥)
+SELECT SAL, CAL_BONUS(7788) FROM EMP WHERE EMPNO=7788;
